@@ -1,3 +1,10 @@
+fun next() = readLine()!!.trim()
+
 fun main() {
-    println("Hello world!")
+    var inp = next().toInt()
+
+    while(inp != 42) {
+        println(inp)
+        inp = next().toInt()
+    }
 }
