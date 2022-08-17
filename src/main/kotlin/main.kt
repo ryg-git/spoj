@@ -1,26 +1,26 @@
 fun next() = readLine()!!.trim()
+fun nextInt() = readLine()!!.trim().toInt()
+fun nextInts() = next().split(" ").map { it.toInt() }
 
 fun main() {
-    var t = next().toInt()
 
-    while(t-- > 0) {
-        solve()
-    }
-}
+    val t = nextInt()
 
-fun solve() {
-    val n = next().toCharArray()
-    var ans = charArrayOf()
-    var an = 0
-    for (a in n) {
-        if(ans.size == 3 && a !in ans) {
-            ans = charArrayOf()
-            an++
-        }
-        if (a !in ans) {
-            ans += a
+    repeat (t) {
+        readLine()
+        val (_, k) = nextInts()
+        val stations = nextInts().withIndex().groupBy { it.value }
+
+        repeat(k) {
+            val (s1, s2) = nextInts()
+
+            stations[s1].let {
+                if((it?.first()?.index ?: Int.MAX_VALUE) < (stations[s2]?.last()?.index ?: 0)) {
+                    println("YES")
+                } else {
+                    println("NO")
+                }
+            }
         }
     }
-    an += if (ans.isEmpty()) 0 else 1
-    println(an)
 }
