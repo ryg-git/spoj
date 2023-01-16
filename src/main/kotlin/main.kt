@@ -11,29 +11,14 @@ fun main() {
 }
 
 fun solve() {
-    val (sc, vmc, st) = next().split(";")
-    if (sc == "S") {
-        val sp = st
-            .split(Regex("(?=[A-Z])")).joinToString(" ") {
-                val a = it.lowercase()
-                a.filter { it1 -> it1 != '(' && it1 != ')' }
-            }
-        println(sp)
-    } else if (sc == "C") {
-        if (vmc in arrayOf("V", "M")) {
-            val a = st.split(" ")
-            val (fi, rest) = a.take(1) to a.drop(1)
-            val ans = fi[0] + rest.joinToString("") {
-                it.replaceFirstChar { it1 -> if (it1.isLowerCase()) it1.titlecase() else it1.toString() }
-            }
-            println(ans + if (vmc == "M") "()" else "")
-        } else {
-            val ans = st.split(" ").joinToString("") {
-                it.replaceFirstChar { it1 -> if (it1.isLowerCase()) it1.titlecase() else it1.toString() }
-            }
-            println(ans)
-        }
-    }
+    val (n, k) = nextInts()
+    val arr = nextInts()
+
+    var ans = 0;
+
+    for (i in 0 until n)
+        for (j in i + 1 until n)
+            ans += if (i != j && (arr[i] + arr[j]) % k == 0) 1 else 0
+
+    println(ans)
 }
-
-
