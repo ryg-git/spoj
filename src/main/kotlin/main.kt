@@ -1,9 +1,11 @@
-fun next() = readln().trim()
-fun nextInt() = readln().trim().toInt()
-fun nextInts() = readln().trim().split(" ").map { it.toInt() }
+import kotlin.math.sqrt
+
+fun next() = readLine()!!.trim()
+fun nextInt() = readLine()!!.trim().toInt()
+fun nextInts() = readLine()!!.trim().split(" ").map { it.toInt() }
 
 fun main() {
-    val t = 1
+    val t = nextInt()
 
     repeat(t) {
         solve()
@@ -11,14 +13,17 @@ fun main() {
 }
 
 fun solve() {
-    val (n, k) = nextInts()
-    val arr = nextInts()
+    val (n, m) = nextInts()
 
-    var ans = 0;
-
-    for (i in 0 until n)
-        for (j in i + 1 until n)
-            ans += if (i != j && (arr[i] + arr[j]) % k == 0) 1 else 0
-
-    println(ans)
+    for (i in (if(n > 1) n else 2)..m) {
+        var p = true
+        val up = sqrt(i.toDouble()).toInt()
+        for (j in 2..up) {
+            if (i % j == 0) {
+                p = false
+                break
+            }
+        }
+        if (p) println(i)
+    }
 }
