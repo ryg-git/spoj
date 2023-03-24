@@ -1,4 +1,5 @@
-import kotlin.math.sqrt
+import java.util.*
+
 
 fun next() = readLine()!!.trim()
 fun nextInt() = readLine()!!.trim().toInt()
@@ -13,17 +14,16 @@ fun main() {
 }
 
 fun solve() {
-    val (n, m) = nextInts()
-
-    for (i in (if(n > 1) n else 2)..m) {
-        var p = true
-        val up = sqrt(i.toDouble()).toInt()
-        for (j in 2..up) {
-            if (i % j == 0) {
-                p = false
-                break
-            }
+    val expr = next()
+    val st = ArrayDeque<Char>(listOf())
+    for (i in expr.toCharArray()) {
+        if (i == ')')  {
+            val tp = st.removeLast()
+            st.removeLast()
+            print(tp)
         }
-        if (p) println(i)
+        else if (i.isLetter()) print(i)
+        else st.addLast(i)
     }
+    println()
 }
