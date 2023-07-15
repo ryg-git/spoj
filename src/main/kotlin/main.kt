@@ -1,3 +1,5 @@
+import kotlin.math.max
+
 fun next() = readLine()!!.trim()
 fun nextInt() = readLine()!!.trim().toInt()
 fun nextInts() = readLine()!!.trim().split(" ").map { it.toInt() }
@@ -11,58 +13,21 @@ fun main() {
 }
 
 fun solve() {
-    val str = next().toCharArray().dropWhile { it == '0' }.toMutableList()
+    val locations = intArrayOf(1, 5, 7, 8, 5, 3, 4, 2, 1)
+    val diff = -2
 
-    val half = str.size / 2
+    val ans = longestSubsequence(locations, diff)
+    println(ans)
+}
 
-    var ne = true
+fun longestSubsequence(arr: IntArray, difference: Int): Int {
+    val m = HashMap<Int, Int>()
+    var ans = 0
 
-    var ans = mutableListOf<Char>()
-
-    var isSmaller = false
-    var isLarger = false
-    var isEqual = true
-
-    for (i in half..str.lastIndex) {
-        if (!isLarger && str[i] > str[str.lastIndex - i]) {
-            isSmaller = true
-            isEqual = false
-        }
-        if (!isSmaller && str[i] < str[str.lastIndex - i]) {
-            isLarger = true
-            isEqual = false
-        }
-
-        ne = ne && str[i] == str[str.lastIndex - i]
-
-        str[i] = str[str.lastIndex - i]
+    for (i in arr) {
+        val ad = m.getOrDefault(i - difference, 0)
+        m[i] = ad + 1
+        ans = max(ans, m.getOrDefault(i, 0))
     }
-
-    if (isSmaller || isEqual) {
-        var changed = false
-
-        for (i in half..str.lastIndex) {
-            if (str[i] != '9') {
-                val newNum = (str[i].toInt() + 1).toChar()
-                str[i] = newNum
-                str[str.lastIndex - i] = newNum
-                changed = true
-                ans = str.toMutableList()
-                break
-            } else {
-                str[i] = '0'
-                str[str.lastIndex - i] = '0'
-            }
-        }
-
-        if (!changed) {
-            ans.add('1')
-            for (i in 1..str.lastIndex) ans.add('0')
-            ans.add('1')
-        }
-    } else {
-        ans = str.toMutableList()
-    }
-
-    println(ans.joinToString(""))
+    return ans
 }
