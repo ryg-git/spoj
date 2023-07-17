@@ -1,6 +1,3 @@
-import kotlin.math.max
-import kotlin.math.min
-
 fun next() = readLine()!!.trim()
 fun nextInt() = readLine()!!.trim().toInt()
 fun nextInts() = readLine()!!.trim().split(" ").map { it.toInt() }
@@ -30,76 +27,68 @@ fun main() {
     }
 }
 
+class ListNode(var `val`: Int) {
+    var next: ListNode? = null
+}
 
 fun solve() {
-    val req_skills = arrayOf("algorithms","math","java","reactjs","csharp","aws")
+    val l1 = ListNode(9).apply { next = ListNode(4) }
+    val l2 = ListNode(9)
 
-    val people = listOf(
-        listOf("algorithms","math","java"),
-        listOf("algorithms","math","reactjs"),
-        listOf("java","csharp","aws"),
-        listOf("reactjs","csharp"),
-        listOf("csharp","math"),
-        listOf("aws","java"),
-    )
+    val ans = addTwoNumbers(l1, l2)
+    println(ans)
+}
 
-    val ans = smallestSufficientTeam(req_skills, people)
-//    val ans = oneBits(4L)
-    for (i in ans) {
-        print("$i, ")
+fun lastNodes(ans: MutableList<Int>, l1: ListNode?, l2: ListNode?) {
+    if (l1!!.next != null) {
+        if (l2!!.next == null) {
+            return
+        }
     }
 }
 
-fun oneBits(num: Long): Int {
-    var n = num
-    var cnt = 0
-    while (n > 0) {
-        if (n and 1 == 1L) cnt++
-        n = n shr 1
-    }
-    return cnt
+fun getNumInString(num: ListNode?): String {
+    return if (num == null) ""
+    else num.`val`.toString() + getNumInString(num.next)
 }
 
-fun smallestSufficientTeam(req_skills: Array<String>, people: List<List<String>>): IntArray {
-    val m = req_skills.size
-    val n = people.size
+fun addTwoNumbers(l1: ListNode?, l2: ListNode?): ListNode? {
+    var sl1 = getNumInString(l1)
+    var sl2 = getNumInString(l2)
 
-    val sMap = req_skills.mapIndexed {index: Int, s: String ->  s to index}.toMap()
+    if (sl1.length > sl2.length) sl2 = sl2.padStart(sl1.length, '0')
+    else sl1 = sl1.padStart(sl2.length, '0')
 
-    val pSkills = LongArray(n) {0L}
+//    println(sl1)
+//    println(sl2)
 
-    for (i in people.indices) {
-        for (j in people[i]) pSkills[i] = pSkills[i] or (1L shl sMap.getOrDefault(j, 0))
+    var carry = 0
+
+    var an = ""
+
+    for (i in sl1.lastIndex downTo 0) {
+        val s = carry + sl1[i].digitToIntOrNull()!! + sl2[i].digitToIntOrNull()!!
+
+        val re = s % 10
+        carry = s / 10
+
+        an += re
     }
 
-    val dp = LongArray(1 shl m) {(1L shl n) - 1}
+    if(carry > 0) an += carry
 
-    dp[0] = 0
+//    println(an.reversed())
 
-    for (i in 1L until (1L shl m)) {
-        for (j in people.indices) {
-            val remaining = i and pSkills[j].inv()
-            if (i != remaining) {
-                val hSkills = dp[remaining.toInt()] or (1L shl j)
-                if (oneBits(hSkills) < oneBits(dp[i.toInt()])) {
-                    dp[i.toInt()] = hSkills
-                }
-            }
-        }
+    var fir: ListNode? = null
+
+    for (i in an) {
+        fir = ListNode(i.digitToInt()).apply { next = fir }
     }
 
-    var ansMask = dp[dp.lastIndex]
+//    while (fir != null) {
+//        print(fir.`val`)
+//        fir = fir.next
+//    }
 
-    val ans = IntArray(oneBits(ansMask))
-
-    var cnt = 0
-
-    for (i in people.indices) {
-        if ((ansMask and 1) == 1L) {
-            ans[cnt++] = i
-        }
-        ansMask = ansMask shr 1
-    }
-
-    return ans
+    return fir
 }
