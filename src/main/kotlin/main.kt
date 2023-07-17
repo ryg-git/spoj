@@ -32,51 +32,74 @@ fun main() {
 
 
 fun solve() {
-    val events = arrayOf(
-        intArrayOf(1, 1, 1),
-        intArrayOf(2, 2, 2),
-        intArrayOf(3, 3, 3),
-        intArrayOf(4, 4, 4),
+    val req_skills = arrayOf("algorithms","math","java","reactjs","csharp","aws")
+
+    val people = listOf(
+        listOf("algorithms","math","java"),
+        listOf("algorithms","math","reactjs"),
+        listOf("java","csharp","aws"),
+        listOf("reactjs","csharp"),
+        listOf("csharp","math"),
+        listOf("aws","java"),
     )
 
-    val k = 3
-
-    val ans = maxValue(events, k)
-    println(ans)
+    val ans = smallestSufficientTeam(req_skills, people)
+//    val ans = oneBits(4L)
+    for (i in ans) {
+        print("$i, ")
+    }
 }
 
-fun findNext(events: Array<IntArray>, target: Int): Int {
-    var l = 0
-    var r = events.size
+fun oneBits(num: Long): Int {
+    var n = num
+    var cnt = 0
+    while (n > 0) {
+        if (n and 1 == 1L) cnt++
+        n = n shr 1
+    }
+    return cnt
+}
 
-    while (l < r) {
-        val mid = (l + r) / 2
-        if (events[mid][0] <= target) {
-            l = mid + 1
-        } else {
-            r = mid
+fun smallestSufficientTeam(req_skills: Array<String>, people: List<List<String>>): IntArray {
+    val m = req_skills.size
+    val n = people.size
+
+    val sMap = req_skills.mapIndexed {index: Int, s: String ->  s to index}.toMap()
+
+    val pSkills = LongArray(n) {0L}
+
+    for (i in people.indices) {
+        for (j in people[i]) pSkills[i] = pSkills[i] or (1L shl sMap.getOrDefault(j, 0))
+    }
+
+    val dp = LongArray(1 shl m) {(1L shl n) - 1}
+
+    dp[0] = 0
+
+    for (i in 1L until (1L shl m)) {
+        for (j in people.indices) {
+            val remaining = i and pSkills[j].inv()
+            if (i != remaining) {
+                val hSkills = dp[remaining.toInt()] or (1L shl j)
+                if (oneBits(hSkills) < oneBits(dp[i.toInt()])) {
+                    dp[i.toInt()] = hSkills
+                }
+            }
         }
     }
 
-    return l
-}
+    var ansMask = dp[dp.lastIndex]
 
-fun maxValue(events: Array<IntArray>, k: Int): Int {
-    events.sortBy { it[0] }
+    val ans = IntArray(oneBits(ansMask))
 
-    val n = events.size
+    var cnt = 0
 
-    val dp = Array(k + 1) { IntArray(n + 1) { 0 } }
-
-    for (i in n - 1 downTo 0) {
-        for (j in 1..k) {
-            val ni = findNext(events, events[i][1])
-            dp[j][i] = max(
-                dp[j][i + 1],
-                events[i][2] + dp[j - 1][ni]
-            )
+    for (i in people.indices) {
+        if ((ansMask and 1) == 1L) {
+            ans[cnt++] = i
         }
+        ansMask = ansMask shr 1
     }
 
-    return dp[k][0]
+    return ans
 }
