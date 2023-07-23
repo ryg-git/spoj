@@ -4,18 +4,6 @@ fun nextInts() = readLine()!!.trim().split(" ").map { it.toInt() }
 
 
 fun solve1() {
-    val (n, t, m) = nextInts()
-
-    val mp = mutableMapOf<Int, Int>()
-
-    for (i in 1..m) {
-        val (a, b) = nextInts()
-        val am = mp.getOrDefault(a, 0)
-        val bm = mp.getOrDefault(b, 0)
-        mp[a] = am + 1
-        mp[b] = bm + 1
-    }
-
 }
 
 fun main() {
@@ -28,49 +16,57 @@ fun main() {
 }
 
 fun solve() {
-    val a = intArrayOf(-2, 2, 1, -2)
+//    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
+//    val nums = intArrayOf(1, 3, 5, 4, 7)
+    val ans = knightProbability(3, 2, 0, 0)
 
-    val ans = asteroidCollision(a)
-
-    for (i in ans) print("$i, ")
-    println()
+    println(ans)
 }
 
-fun asteroidCollision(asteroids: IntArray): IntArray {
-    val st = ArrayDeque<Int>()
-    val neg = mutableListOf<Int>()
-    for (i in asteroids) {
-        if (i > 0) {
-            st.addLast(i)
-        } else {
-            if (st.isNotEmpty()) {
-                var e = st.last()
-                if (e + i > 0) {
-                    continue
-                } else if (e + i == 0) {
-                    st.removeLast()
-                } else if (e + i < 0) {
-                    var equalFlag = false
-                    while (e + i <= 0 && st.size > 0) {
-                        st.removeLast()
-                        if (e == (-1 * i)) {
-                            equalFlag = true
-                            break
-                        }
-                        if (st.isNotEmpty()) e = st.last()
+fun knightProbability(n: Int, k: Int, row: Int, column: Int): Double {
+    val directions = arrayOf(
+        intArrayOf(1, 2),
+        intArrayOf(1, -2),
+        intArrayOf(-1, 2),
+        intArrayOf(-1, -2),
+        intArrayOf(2, 1),
+        intArrayOf(2, -1),
+        intArrayOf(-2, 1),
+        intArrayOf(-2, -1)
+    )
+
+    val dp = Array(k + 1) {
+        Array(n) {
+            DoubleArray(
+                n
+            )
+        }
+    }
+
+    dp[0][row][column] = 1.0
+
+    for (moves in 1..k) {
+        for (i in 0 until n) {
+            for (j in 0 until n) {
+                for (direction in directions) {
+                    val prevI = i - direction[0]
+                    val prevJ = j - direction[1]
+                    // Check if the previous cell is within the chessboard
+                    if (prevI in 0 until n && prevJ >= 0 && prevJ < n) {
+                        // Add the previous probability divided by 8
+                        dp[moves][i][j] += dp[moves - 1][prevI][prevJ] / 8.0
                     }
-                    if (!equalFlag && st.size == 0) neg.add(i)
                 }
-            } else {
-                neg.add(i)
             }
         }
     }
 
-    for (i in st) neg.add(i)
+    var totalProbability = 0.0
+    for (i in 0 until n) {
+        for (j in 0 until n) {
+            totalProbability += dp[k][i][j]
+        }
+    }
 
-    return neg.toIntArray()
+    return totalProbability
 }
-
-
-
