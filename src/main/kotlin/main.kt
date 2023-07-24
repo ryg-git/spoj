@@ -1,3 +1,6 @@
+import java.util.*
+
+
 fun next() = readLine()!!.trim()
 fun nextInt() = readLine()!!.trim().toInt()
 fun nextInts() = readLine()!!.trim().split(" ").map { it.toInt() }
@@ -18,55 +21,38 @@ fun main() {
 fun solve() {
 //    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
 //    val nums = intArrayOf(1, 3, 5, 4, 7)
-    val ans = knightProbability(3, 2, 0, 0)
+    val ans = allPossibleFBT(3)
 
     println(ans)
 }
 
-fun knightProbability(n: Int, k: Int, row: Int, column: Int): Double {
-    val directions = arrayOf(
-        intArrayOf(1, 2),
-        intArrayOf(1, -2),
-        intArrayOf(-1, 2),
-        intArrayOf(-1, -2),
-        intArrayOf(2, 1),
-        intArrayOf(2, -1),
-        intArrayOf(-2, 1),
-        intArrayOf(-2, -1)
-    )
+class TreeNode(var `val`: Int) {
+    var left: TreeNode? = null
+    var right: TreeNode? = null
+}
 
-    val dp = Array(k + 1) {
-        Array(n) {
-            DoubleArray(
-                n
-            )
-        }
+fun allPossibleFBT(n: Int): List<TreeNode?> {
+    if (n % 2 == 0) {
+        return listOf()
     }
 
-    dp[0][row][column] = 1.0
+    val dp = Array(n + 1) { mutableListOf<TreeNode?>() }
 
-    for (moves in 1..k) {
-        for (i in 0 until n) {
-            for (j in 0 until n) {
-                for (direction in directions) {
-                    val prevI = i - direction[0]
-                    val prevJ = j - direction[1]
-                    // Check if the previous cell is within the chessboard
-                    if (prevI in 0 until n && prevJ >= 0 && prevJ < n) {
-                        // Add the previous probability divided by 8
-                        dp[moves][i][j] += dp[moves - 1][prevI][prevJ] / 8.0
-                    }
+    dp[1] = mutableListOf(TreeNode(0))
+
+    for (cnt in 3..n step 2) {
+        for (i in 1 until cnt step 2) {
+            val j = cnt - i - 1
+            for (left in dp[i]) {
+                for (right in dp[j]) {
+                    val tn = TreeNode(0)
+                    tn.left = left
+                    tn.right = right
+                    dp[cnt].add(tn)
                 }
             }
         }
     }
 
-    var totalProbability = 0.0
-    for (i in 0 until n) {
-        for (j in 0 until n) {
-            totalProbability += dp[k][i][j]
-        }
-    }
-
-    return totalProbability
+    return dp[n]
 }
