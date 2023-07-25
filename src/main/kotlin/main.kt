@@ -20,39 +20,33 @@ fun main() {
 
 fun solve() {
 //    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
-//    val nums = intArrayOf(1, 3, 5, 4, 7)
-    val ans = allPossibleFBT(3)
+    val nums = intArrayOf(0,2,1,0)
+    val ans = peakIndexInMountainArray(nums)
 
     println(ans)
 }
 
-class TreeNode(var `val`: Int) {
-    var left: TreeNode? = null
-    var right: TreeNode? = null
-}
+fun bs(arr: IntArray): Int {
+    var l = 0
+    var r = arr.lastIndex
 
-fun allPossibleFBT(n: Int): List<TreeNode?> {
-    if (n % 2 == 0) {
-        return listOf()
-    }
-
-    val dp = Array(n + 1) { mutableListOf<TreeNode?>() }
-
-    dp[1] = mutableListOf(TreeNode(0))
-
-    for (cnt in 3..n step 2) {
-        for (i in 1 until cnt step 2) {
-            val j = cnt - i - 1
-            for (left in dp[i]) {
-                for (right in dp[j]) {
-                    val tn = TreeNode(0)
-                    tn.left = left
-                    tn.right = right
-                    dp[cnt].add(tn)
-                }
-            }
+    while (l < r) {
+        val mid = (l + r) / 2
+        if (arr[mid - 1] < arr[mid] && arr[mid] > arr[mid + 1]) {
+            l = mid
+            break
+        }
+        else if (arr[mid - 1] < arr[mid] && arr[mid] < arr[mid + 1]) {
+            l = mid + 1
+        }
+        else if (arr[mid - 1] > arr[mid] && arr[mid] > arr[mid + 1]) {
+            r = mid
         }
     }
 
-    return dp[n]
+    return l
+}
+
+fun peakIndexInMountainArray(arr: IntArray): Int {
+    return bs(arr)
 }
