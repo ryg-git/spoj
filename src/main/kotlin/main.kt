@@ -1,5 +1,4 @@
-import java.util.*
-import kotlin.collections.ArrayDeque
+import kotlin.math.ceil
 
 
 fun next() = readLine()!!.trim()
@@ -64,15 +63,48 @@ fun main() {
     val t = 1
 
     repeat(t) {
-        solve1()
+        solve()
     }
 }
 
 fun solve() {
 //    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
-//    val nums = intArrayOf(0,2,1,0)
-//    val ans = peakIndexInMountainArray(nums)
-//
-//    println(ans)
+    val dist = intArrayOf(1,3,2)
+    val ans = minSpeedOnTime(dist, 2.7)
+
+    println(ans)
 }
 
+fun timeRequired(dist: IntArray, speed: Int): Double {
+    var time = 0.0
+    for (i in dist.indices) {
+        val t = dist[i].toDouble() / speed.toDouble()
+        time += if (i == dist.size - 1) t else ceil(t)
+    }
+    return time
+}
+
+fun bs(dist: IntArray, hour: Double): Int {
+    var l = 0
+    var r = 10000000
+    var s = -1
+
+    while (l < r) {
+        val mid = (l + r) / 2
+
+        if (timeRequired(dist, mid) <= hour) {
+            r = mid - 1
+            s = mid
+        } else {
+            l = mid + 1
+        }
+    }
+
+    return s
+}
+
+fun minSpeedOnTime(dist: IntArray, hour: Double): Int {
+    if (dist.size > ceil(hour)) return -1
+
+    return bs(dist, hour)
+}
