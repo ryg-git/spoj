@@ -1,59 +1,61 @@
-import java.util.*
 import kotlin.math.ceil
-import kotlin.math.max
 
 
 fun next() = readLine()!!.trim()
 fun nextInt() = readLine()!!.trim().toInt()
 fun nextInts() = readLine()!!.trim().split(" ").map { it.toInt() }
 
-fun isParan(s: String): Boolean {
-    val ad = ArrayDeque<Char>()
-    for (i in s) {
-        if (i == '(') ad.add('(')
-        else {
-            if (ad.isNotEmpty()) ad.pop()
-            else return false
-        }
+fun moveCount(xLoc: Int, yLoc: Int, grd: Array<CharArray>, vis: Array<BooleanArray>): Int {
+    val dirs = arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
+
+    vis[xLoc][yLoc] = true
+
+    var cnt = 1
+
+    for (i in vis) {
+        for (j in i) print("$j, ")
+        println()
     }
 
-    if (ad.isEmpty()) println(s)
+    println()
 
-    return ad.isEmpty()
+    cnt += if (((xLoc + dirs[0].first) in 1 until grd.lastIndex) && ((yLoc + dirs[0].second) in 1 until grd.first().lastIndex)) {
+        val nx = xLoc + dirs[0].first
+        val ny = yLoc + dirs[0].second
+        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
+            moveCount(nx, ny, grd, vis)
+        } else 0
+    } else 0
+    cnt += if (((xLoc + dirs[1].first) in 1 until grd.lastIndex) && ((yLoc + dirs[1].second) in 1 until grd.first().lastIndex)) {
+        val nx = xLoc + dirs[1].first
+        val ny = yLoc + dirs[1].second
+        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
+            moveCount(nx, ny, grd, vis)
+        } else 0
+    } else 0
+    cnt += if (((xLoc + dirs[2].first) in 1 until grd.lastIndex) && ((yLoc + dirs[2].second) in 1 until grd.first().lastIndex)) {
+        val nx = xLoc + dirs[2].first
+        val ny = yLoc + dirs[2].second
+        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
+            moveCount(nx, ny, grd, vis)
+        } else 0
+    } else 0
+    cnt += if (((xLoc + dirs[3].first) in 1 until grd.lastIndex) && ((yLoc + dirs[3].second) in 1 until grd.first().lastIndex)) {
+        val nx = xLoc + dirs[3].first
+        val ny = yLoc + dirs[3].second
+        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
+            moveCount(nx, ny, grd, vis)
+        } else 0
+    } else 0
+    return cnt
 }
 
-
 fun solve1() {
-    val s = next()
-    val ind = mutableListOf<Int>()
-
-    for (i in s.indices) {
-        if (s[i] == '?') ind.add(i)
-    }
-
-    var an = 0
-
-    println(ind.size)
-
-    if (ind.isNotEmpty()) {
-        val cn = 1 shl ind.size
-        for (i in 0 until cn) {
-            val itn = i.toString(2).padStart(ind.size, '0')
-            var ns = s
-
-            val av = ns.toCharArray()
-
-            for (j in itn.indices) {
-                if (itn[j] == '0') av[ind[j]] = '(' else av[ind[j]] = ')'
-            }
-
-            ns = String(av)
-
-            if (isParan(ns)) an++
-        }
-    }
-
-    println(an)
+    val (n, m) = nextInts()
+    val grd = Array(n) { next().toCharArray() }
+    val vis = Array(n) { BooleanArray(m) { false } }
+    val ans = moveCount(1, 1, grd, vis)
+    println(ans)
 }
 
 fun main() {
@@ -65,40 +67,44 @@ fun main() {
     }
 }
 
-fun calculateDP(i: Int, j: Int, dp: Map<Int?, Map<Int?, Double>>): Double {
-    return (dp[max(0, i - 4)]!![j]!!
-            + dp[max(0, i - 3)]!![j - 1]!!
-            + dp[max(0, i - 2)]!![max(0, j - 2)]!!
-            + dp[i - 1]!![max(0, j - 3)]!!) / 4
+fun solve() {
+//    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
+    val dist = intArrayOf(1,3,2)
+    val ans = minSpeedOnTime(dist, 2.7)
+
+    println(ans)
 }
 
-fun soupServings(n: Int): Double {
-    val m = ceil(n / 25.0).toInt()
-    val dp = mutableMapOf<Int?, MutableMap<Int?, Double>>()
-    dp[0] = mutableMapOf()
-    dp[0]!![0] = 0.5
+fun timeRequired(dist: IntArray, speed: Int): Double {
+    var time = 0.0
+    for (i in dist.indices) {
+        val t = dist[i].toDouble() / speed.toDouble()
+        time += if (i == dist.size - 1) t else ceil(t)
+    }
+    return time
+}
 
-    for (k in 1..m) {
-        dp[k] = HashMap()
-        dp[0]!![k] = 1.0
-        dp[k]!![0] = 0.0
-        for (j in 1..k) {
-            dp[j]!![k] = calculateDP(j, k, dp)
-            dp[k]!![j] = calculateDP(k, j, dp)
-        }
-        if (dp[k]!![k]!! > 1 - 1e-5) {
-            return 1.0
+fun bs(dist: IntArray, hour: Double): Int {
+    var l = 0
+    var r = 10000000
+    var s = -1
+
+    while (l < r) {
+        val mid = (l + r) / 2
+
+        if (timeRequired(dist, mid) <= hour) {
+            r = mid - 1
+            s = mid
+        } else {
+            l = mid + 1
         }
     }
 
-    return dp[m]!![m]!!
+    return s
 }
 
-fun solve() {
-//    val dist = intArrayOf(1, 5, 233, 7)
+fun minSpeedOnTime(dist: IntArray, hour: Double): Int {
+    if (dist.size > ceil(hour)) return -1
 
-
-    val ans = soupServings(100)
-
-    println(ans)
+    return bs(dist, hour)
 }
