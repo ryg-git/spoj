@@ -1,4 +1,5 @@
 import kotlin.math.ceil
+import kotlin.math.min
 
 
 fun next() = readLine()!!.trim()
@@ -69,42 +70,35 @@ fun main() {
 
 fun solve() {
 //    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
-    val dist = intArrayOf(1,3,2)
-    val ans = minSpeedOnTime(dist, 2.7)
+//    val dist = intArrayOf(1, 1, 2)
+
+    val ans = minimumDeleteSum("sea", "eat")
 
     println(ans)
 }
 
-fun timeRequired(dist: IntArray, speed: Int): Double {
-    var time = 0.0
-    for (i in dist.indices) {
-        val t = dist[i].toDouble() / speed.toDouble()
-        time += if (i == dist.size - 1) t else ceil(t)
+fun minimumDeleteSum(s1: String, s2: String): Int {
+    val dp = Array(s1.length + 1) { IntArray(s2.length + 1) }
+
+    for (i in s1.indices) {
+        dp[i + 1][0] = dp[i][0] + s1[i].toInt()
     }
-    return time
-}
 
-fun bs(dist: IntArray, hour: Double): Int {
-    var l = 0
-    var r = 10000000
-    var s = -1
+    for (j in s1.indices) {
+        dp[0][j + 1] = dp[0][j] + s2[j].toInt()
+    }
 
-    while (l < r) {
-        val mid = (l + r) / 2
-
-        if (timeRequired(dist, mid) <= hour) {
-            r = mid - 1
-            s = mid
-        } else {
-            l = mid + 1
+    for (i in 1..s1.length) {
+        for (j in 1..s2.length) {
+            if (s1[i - 1] == s2[j - 1]) dp[i][j] = dp[i - 1][j - 1]
+            else {
+                dp[i][j] = min(
+                    s1[i - 1].toInt() + dp[i - 1][j],
+                    s2[j - 1].toInt() + dp[i][j - 1]
+                )
+            }
         }
     }
 
-    return s
-}
-
-fun minSpeedOnTime(dist: IntArray, hour: Double): Int {
-    if (dist.size > ceil(hour)) return -1
-
-    return bs(dist, hour)
+    return dp[s1.length][s2.length]
 }
