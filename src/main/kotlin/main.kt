@@ -6,57 +6,8 @@ fun next() = readLine()!!.trim()
 fun nextInt() = readLine()!!.trim().toInt()
 fun nextInts() = readLine()!!.trim().split(" ").map { it.toInt() }
 
-fun moveCount(xLoc: Int, yLoc: Int, grd: Array<CharArray>, vis: Array<BooleanArray>): Int {
-    val dirs = arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
-
-    vis[xLoc][yLoc] = true
-
-    var cnt = 1
-
-    for (i in vis) {
-        for (j in i) print("$j, ")
-        println()
-    }
-
-    println()
-
-    cnt += if (((xLoc + dirs[0].first) in 1 until grd.lastIndex) && ((yLoc + dirs[0].second) in 1 until grd.first().lastIndex)) {
-        val nx = xLoc + dirs[0].first
-        val ny = yLoc + dirs[0].second
-        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
-            moveCount(nx, ny, grd, vis)
-        } else 0
-    } else 0
-    cnt += if (((xLoc + dirs[1].first) in 1 until grd.lastIndex) && ((yLoc + dirs[1].second) in 1 until grd.first().lastIndex)) {
-        val nx = xLoc + dirs[1].first
-        val ny = yLoc + dirs[1].second
-        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
-            moveCount(nx, ny, grd, vis)
-        } else 0
-    } else 0
-    cnt += if (((xLoc + dirs[2].first) in 1 until grd.lastIndex) && ((yLoc + dirs[2].second) in 1 until grd.first().lastIndex)) {
-        val nx = xLoc + dirs[2].first
-        val ny = yLoc + dirs[2].second
-        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
-            moveCount(nx, ny, grd, vis)
-        } else 0
-    } else 0
-    cnt += if (((xLoc + dirs[3].first) in 1 until grd.lastIndex) && ((yLoc + dirs[3].second) in 1 until grd.first().lastIndex)) {
-        val nx = xLoc + dirs[3].first
-        val ny = yLoc + dirs[3].second
-        if (grd[nx][ny] != '#' && !vis[nx][ny]) {
-            moveCount(nx, ny, grd, vis)
-        } else 0
-    } else 0
-    return cnt
-}
-
 fun solve1() {
-    val (n, m) = nextInts()
-    val grd = Array(n) { next().toCharArray() }
-    val vis = Array(n) { BooleanArray(m) { false } }
-    val ans = moveCount(1, 1, grd, vis)
-    println(ans)
+
 }
 
 fun main() {
@@ -72,33 +23,35 @@ fun solve() {
 //    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
 //    val dist = intArrayOf(1, 1, 2)
 
-    val ans = minimumDeleteSum("sea", "eat")
+    val grid = intArrayOf(993335, 993336, 993337, 993338, 993339, 993340, 993341)
+//    val grid = intArrayOf(4, 4)
+
+
+    val s = Solution()
+
+    val ans = s.validPartition(grid)
 
     println(ans)
 }
 
-fun minimumDeleteSum(s1: String, s2: String): Int {
-    val dp = Array(s1.length + 1) { IntArray(s2.length + 1) }
+class Solution {
+    fun validPartition(nums: IntArray): Boolean {
+        val dp = BooleanArray(nums.size + 1) { false }
+        dp[0] = true
 
-    for (i in s1.indices) {
-        dp[i + 1][0] = dp[i][0] + s1[i].toInt()
-    }
+        for (i in 2..nums.size) {
+            val x = nums[i - 1]
+            val y = nums[i - 2]
 
-    for (j in s1.indices) {
-        dp[0][j + 1] = dp[0][j] + s2[j].toInt()
-    }
+            if (x == y) dp[i] = dp[i] || dp[i - 2]
 
-    for (i in 1..s1.length) {
-        for (j in 1..s2.length) {
-            if (s1[i - 1] == s2[j - 1]) dp[i][j] = dp[i - 1][j - 1]
-            else {
-                dp[i][j] = min(
-                    s1[i - 1].toInt() + dp[i - 1][j],
-                    s2[j - 1].toInt() + dp[i][j - 1]
-                )
+            if (i > 2) {
+                val z = nums[i - 3]
+                if (x == y && y == z) dp[i] = dp[i] || dp[i - 3]
+                else if (x == y + 1 && y == z + 1) dp[i] = dp[i] || dp[i - 3]
             }
         }
-    }
 
-    return dp[s1.length][s2.length]
+        return dp.last()
+    }
 }
