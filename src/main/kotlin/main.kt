@@ -1,4 +1,5 @@
 import kotlin.math.ceil
+import kotlin.math.max
 import kotlin.math.min
 
 
@@ -23,35 +24,41 @@ fun solve() {
 //    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
 //    val dist = intArrayOf(1, 1, 2)
 
-    val grid = intArrayOf(993335, 993336, 993337, 993338, 993339, 993340, 993341)
+    val grid = intArrayOf(3, 2, 1, 5, 6, 4)
 //    val grid = intArrayOf(4, 4)
-
 
     val s = Solution()
 
-    val ans = s.validPartition(grid)
+    val ans = s.findKthLargest(grid, 2)
 
     println(ans)
 }
 
 class Solution {
-    fun validPartition(nums: IntArray): Boolean {
-        val dp = BooleanArray(nums.size + 1) { false }
-        dp[0] = true
+    private fun partition(x: Int, nums: IntArray, l: Int, r: Int): IntArray {
+        val piv = nums[l]
 
-        for (i in 2..nums.size) {
-            val x = nums[i - 1]
-            val y = nums[i - 2]
+        var part = l + 1
 
-            if (x == y) dp[i] = dp[i] || dp[i - 2]
-
-            if (i > 2) {
-                val z = nums[i - 3]
-                if (x == y && y == z) dp[i] = dp[i] || dp[i - 3]
-                else if (x == y + 1 && y == z + 1) dp[i] = dp[i] || dp[i - 3]
+        for (i in l + 1..r) {
+            if (nums[i] >= piv) {
+                nums[part] = nums[i].also { nums[i] = nums[part] }
+                part++
             }
         }
 
-        return dp.last()
+        part--
+
+        nums[l] = nums[part].also { nums[part] = nums[l] }
+
+        if (part == x) return nums
+        else if (x in part + 1..r) return partition(x, nums, part + 1, r)
+        else if (x in l until part) return partition(x, nums, l, part - 1)
+        return nums
+    }
+
+    fun findKthLargest(nums: IntArray, k: Int): Int {
+        val arr = partition(k - 1, nums, 0, nums.lastIndex)
+        return arr[k - 1]
     }
 }
