@@ -24,41 +24,41 @@ fun solve() {
 //    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
 //    val dist = intArrayOf(1, 1, 2)
 
-    val grid = intArrayOf(3, 2, 1, 5, 6, 4)
+    val grid = intArrayOf(4, 2, 0, 3, 2, 5)
+//    val cost = intArrayOf(3, 4, 5, 1, 2)
 //    val grid = intArrayOf(4, 4)
 
     val s = Solution()
 
-    val ans = s.findKthLargest(grid, 2)
+    val ans = s.trap(grid)
 
     println(ans)
 }
 
 class Solution {
-    private fun partition(x: Int, nums: IntArray, l: Int, r: Int): IntArray {
-        val piv = nums[l]
+    fun trap(height: IntArray): Int {
+        val mxht = height.withIndex().maxBy { it.value }?.index ?: 0
 
-        var part = l + 1
-
-        for (i in l + 1..r) {
-            if (nums[i] >= piv) {
-                nums[part] = nums[i].also { nums[i] = nums[part] }
-                part++
-            }
-        }
-
-        part--
-
-        nums[l] = nums[part].also { nums[part] = nums[l] }
-
-        if (part == x) return nums
-        else if (x in part + 1..r) return partition(x, nums, part + 1, r)
-        else if (x in l until part) return partition(x, nums, l, part - 1)
-        return nums
+        return getWater(height, mxht)
     }
 
-    fun findKthLargest(nums: IntArray, k: Int): Int {
-        val arr = partition(k - 1, nums, 0, nums.lastIndex)
-        return arr[k - 1]
+    private fun getWater(height: IntArray, r: Int): Int {
+
+        var tw = 0
+        var currentMax = 0
+
+        for (i in 0 until r) {
+            currentMax = max(currentMax, height[i])
+            tw += currentMax - height[i]
+        }
+
+        currentMax = 0
+
+        for (i in height.lastIndex downTo r + 1) {
+            currentMax = max(currentMax, height[i])
+            tw += currentMax - height[i]
+        }
+
+        return tw
     }
 }
