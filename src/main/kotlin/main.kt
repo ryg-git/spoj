@@ -1,6 +1,72 @@
-import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
+
+class Solution {
+    fun updateMatrix(mat: Array<IntArray>): Array<IntArray> {
+        val dp = Array(mat.size) { IntArray(mat[0].size) { 1000_000 } }
+
+        val adj1 = arrayOf(
+            -1 to 0,
+            0 to -1
+        )
+
+        for (i in mat.indices) {
+            for (j in mat[i].indices) {
+                if (mat[i][j] == 0) dp[i][j] = 0
+                else {
+                    for ((x, y) in adj1) {
+                        val a = i + x
+                        val b = j + y
+                        if (a in mat.indices && b in mat[i].indices) {
+                            dp[i][j] = min(dp[a][b] + 1, dp[i][j])
+                        }
+                    }
+                }
+            }
+        }
+
+        val adj2 = arrayOf(
+            1 to 0,
+            0 to 1
+        )
+
+        for (i in mat.indices.reversed()) {
+            for (j in mat[i].indices.reversed()) {
+                if (mat[i][j] == 0) dp[i][j] = 0
+                else {
+                    for ((x, y) in adj2) {
+                        val a = i + x
+                        val b = j + y
+
+                        if (a in mat.indices && b in mat[i].indices) {
+                            dp[i][j] = min(dp[a][b] + 1, dp[i][j])
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return dp
+    }
+}
+
+fun solve() {
+
+    val mat = arrayOf(
+        intArrayOf(0, 1, 0),
+        intArrayOf(0, 1, 0),
+        intArrayOf(0, 1, 0),
+        intArrayOf(0, 1, 0),
+        intArrayOf(0, 1, 0),
+    )
+
+    val s = Solution()
+
+    val ans = s.updateMatrix(mat)
+
+    for (i in ans) println(i.contentToString())
+}
 
 
 fun next() = readLine()!!.trim()
@@ -20,45 +86,3 @@ fun main() {
     }
 }
 
-fun solve() {
-//    val nums = intArrayOf(1, 2, 4, 3, 5, 4, 7, 2)
-//    val dist = intArrayOf(1, 1, 2)
-
-    val grid = intArrayOf(4, 2, 0, 3, 2, 5)
-//    val cost = intArrayOf(3, 4, 5, 1, 2)
-//    val grid = intArrayOf(4, 4)
-
-    val s = Solution()
-
-    val ans = s.trap(grid)
-
-    println(ans)
-}
-
-class Solution {
-    fun trap(height: IntArray): Int {
-        val mxht = height.withIndex().maxBy { it.value }?.index ?: 0
-
-        return getWater(height, mxht)
-    }
-
-    private fun getWater(height: IntArray, r: Int): Int {
-
-        var tw = 0
-        var currentMax = 0
-
-        for (i in 0 until r) {
-            currentMax = max(currentMax, height[i])
-            tw += currentMax - height[i]
-        }
-
-        currentMax = 0
-
-        for (i in height.lastIndex downTo r + 1) {
-            currentMax = max(currentMax, height[i])
-            tw += currentMax - height[i]
-        }
-
-        return tw
-    }
-}
